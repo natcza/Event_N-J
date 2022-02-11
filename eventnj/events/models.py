@@ -1,22 +1,28 @@
 from django.db import models
 import uuid
 
-PENDING = 1
+SE_PENDING = 1
+SE_PUBLISHED = 2
+SE_ARCHIVE = 3
 
 STATUS_EVENT = (
-    (PENDING, "Pending"),
-    (2, "Published"),
-    (3, "Archive")
+    (SE_PENDING, "Pending"),
+    (SE_PUBLISHED, "Published"),
+    (SE_ARCHIVE, "Archive")
 )
 
-IS_NEW = 1
+SP_IS_NEW = 1
+SP_IS_ACTIVE_MAIL = 2
+SP_IS_DEACTIVATE_MAIL = 3
+SP_IS_ACTIVE_EVENT = 4
+SP_IS_DEACTIVATE_EVENT = 5
 
 STATUS_PARTICIPANT = (
-    (IS_NEW, "Is_New"),
-    (2, "Is_Active_Mail"),
-    (3, "Is_Deactivate_Mail"),
-    (4, "Is_Active_Event"),
-    (5, "Is_Deactivate_Event"),
+    (SP_IS_NEW, "Is_New"),
+    (SP_IS_ACTIVE_MAIL, "Is_Active_Mail"),
+    (SP_IS_DEACTIVATE_MAIL, "Is_Deactivate_Mail"),
+    (SP_IS_ACTIVE_EVENT, "Is_Active_Event"),
+    (SP_IS_DEACTIVATE_EVENT, "Is_Deactivate_Event"),
 )
 
 # Create your models here.
@@ -25,7 +31,7 @@ class Participant(models.Model):
     name = models.CharField(max_length=255)
     mail = models.CharField(max_length=255)
     # status_id = models.ForeignKey("Status_participant", related_name="participant", on_delete=models.CASCADE)
-    status = models.IntegerField(choices=STATUS_PARTICIPANT, default=IS_NEW)
+    status = models.IntegerField(choices=STATUS_PARTICIPANT, default=SP_IS_NEW)
     date_change_status = models.DateTimeField(null=True, blank=True)
     is_reserved = models.BooleanField(default=False)
     # authentication_code = models.UUIDField(default=uuid.uuid4, editable=False)
@@ -46,7 +52,7 @@ class Event(models.Model):
     end = models.DateTimeField()
     start_registration = models.DateTimeField()
     end_registration = models.DateTimeField()
-    status = models.IntegerField(choices=STATUS_EVENT, default=PENDING)
+    status = models.IntegerField(choices=STATUS_EVENT, default=SE_PENDING)
     country = models.CharField(max_length=64)
     city = models.CharField(max_length=64)
     street = models.CharField(max_length=64)
