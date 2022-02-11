@@ -16,10 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-# from events.views import DashboardView
+from events.views import DashboardView
 #
 #
 urlpatterns = [
     path('admin/', admin.site.urls),
-#     path('/', DashboardView.as_view(), name="dashboard"),
+    path('', DashboardView.as_view(), name="dashboard"),
 ]
