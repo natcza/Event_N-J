@@ -15,11 +15,11 @@ from random import choice, randint
 
 
 class Command(BaseCommand):
-    help = "wypełnij organizer danymi -- python manage.py create_reo 1"
+    help = "wypełnij organizer danymi -- python manage.py create_reo [e | o | e1] 1 1"
 
     def add_arguments(self, parser):
 
-        parser.add_argument('choice', choices=['e', 'o'])
+        parser.add_argument('choice', choices=['e', 'o', 'e1'])
         parser.add_argument('total', action="extend", nargs=2, type=int, help="total")
 
     def handle(self, *args, **options):
@@ -27,12 +27,12 @@ class Command(BaseCommand):
 
         opt_choice = options['choice']
 
-        print(f'options: {options}')
+        # print(f'options: {options}')
 
-        if opt_choice == 'e':
-            print('event')
-        elif opt_choice == 'o':
-            print('organizer')
+        # if opt_choice == 'e':
+        #     print('event')
+        # elif opt_choice == 'o':
+        #     print('organizer')
 
 
 
@@ -48,6 +48,7 @@ class Command(BaseCommand):
         len_organizers = len(Organizer.objects.all())
         m = 0
         n = 0
+        print("create_reo")
 
         if opt_choice == 'e':
             # dla losowych eventów m wybierz losowo n organizatorów
@@ -59,7 +60,8 @@ class Command(BaseCommand):
             if result[0] == False:
                 self.stdout.write(self.style.ERROR(result[1]))
             else:
-                self.stdout.write(self.style.SUCCESS(result[1]))
+                pass
+                # self.stdout.write(self.style.SUCCESS(result[1]))
 
         elif opt_choice == 'o':
             # dla losowych organizatorów n wybierz m losowych eventów
@@ -72,9 +74,30 @@ class Command(BaseCommand):
             if result[0] == False:
                 self.stdout.write(self.style.ERROR(result[1]))
             else:
-                self.stdout.write(self.style.SUCCESS(result[1]))
+                pass
+                # self.stdout.write(self.style.SUCCESS(result[1]))
 
-        print(n, m)
+        elif opt_choice == 'e1':
+            # dla eventu m wybierz organizatora n
+            # e1 m n
+            m = opt_total[0]
+            n = opt_total[1]
+            result = set_change(opt_total, len_events, len_organizers)
+
+            if result[0] == False:
+                self.stdout.write(self.style.ERROR(result[1]))
+            else:
+                pass
+                # self.stdout.write(self.style.SUCCESS(result[1]))
+
+            events = Event.objects.get(pk=m)
+            organizer = Organizer.objects.get(pk=n)
+            events.organizers.add(organizer)
+
+            self.stdout.write(self.style.SUCCESS(f"dopisane {1} rekordów"))
+
+            return
+        # print(n, m)
         counter = 0
         # return
 
