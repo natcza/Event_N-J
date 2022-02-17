@@ -1,10 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Hello World</title>
-</head>
-<body>
+{% extends 'events/base.html' %}
+{% block content %}
+List of events:
+    <ul>
+    {% for event in events %}
+        <li><a href='/event-details/{{ event.pk }}'>{{ event.name }}</a></li>
+    {% endfor %}
+    </ul>
 
-</body>
-</html>
+{% endblock %}
