@@ -6,7 +6,7 @@ from .models import Event
 # Create your views here.
 
 class DashboardView(View):
-    template_name = "events/dashboard.html"
+    template_name = "dashboard.html"
 
     def get(self, request, *args, **kwargs):
         events = Event.objects.all().order_by("start")
