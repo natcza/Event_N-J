@@ -26,6 +26,7 @@ class Command(BaseCommand):
         # https://docs.python.org/3.9/library/string.html
         # postfix = "{:0>5}".format(str(ostatni + 1))
 
+        print("create_organizer")
         for i in range(total):
             postfix = str("{:0>5}".format(str(ostatni + 1 + i)))
             # print(postfix)

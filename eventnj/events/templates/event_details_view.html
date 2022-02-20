@@ -1,0 +1,16 @@
+{% extends 'events/base.html' %}
+{% block content %}
+    {% if message %}
+	    <h4>{{ message }}</h4>
+    {% endif %}
+
+    <h1>Event </h1><br>
+    nazwa: {{ event.name }}<br>
+    cena: {{ event.price }} zł<br>
+    opis: {{ event.description }}<br>
+
+<br>
+<br>
+
+<!--    <a href="{% url 'event-list' %}"> << Powrot do listy Eventów  </a>-->
+{% endblock %}

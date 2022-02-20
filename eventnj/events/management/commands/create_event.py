@@ -19,11 +19,15 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         total = options['total']
 
-        # len_events = len(Event.objects.all())
+        len_events = len(Event.objects.all())
 
         # sprawdzaj jaki postfix ma ostatni rekord
         # ostatni = Event.objects.all()[len_events - 1:len_events].get().id
-        ostatni = Event.objects.last().id
+
+        if len_events != 0:
+            ostatni = Event.objects.last().id
+        else:
+            ostatni = 0
 
         # postfix kolejnej wartości
         # https://docs.python.org/3.9/library/string.html
@@ -37,6 +41,8 @@ class Command(BaseCommand):
         CONST_RANDINT_RESERVE = 25
         CONST_RANDINT = 50
         CONST_PRICE = 25
+
+        print("create_event")
 
         for i in range(total):
             postfix = str("{:0>5}".format(str(ostatni + 1 + i)))

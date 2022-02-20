@@ -31,6 +31,7 @@ class Command(BaseCommand):
         # postfix = "{:0>5}".format(str(ostatni + 1))
         # print(f"total: {total}")
 
+        print("create_photo")
 
         for i in range(total[0]):
             postfix = str("{:0>5}".format(str(ostatni + 1 + i)))
@@ -42,5 +43,4 @@ class Command(BaseCommand):
                 event=Event.objects.get(pk=total[1])
             )
 
-        self.stdout.write(self.style.SUCCESS(f"dopisane {total[0]} rekordy"))
-        self.stdout.write(self.style.SUCCESS(f"event {total[1]}"))
+        self.stdout.write(self.style.SUCCESS(f"dopisane {total[0]} rekordy, event {total[1]}"))

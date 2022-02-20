@@ -5,10 +5,13 @@ from events.models import Participant, Event
 
 
 class Command(BaseCommand):
-    help = "wypełnij participant danymi -- python manage.py create_participant 5"
+    help = "wypełnij participant danymi 5 uczestników przypisz do eventu o pk=3 " \
+           "-- python manage.py create_participant 5 3"
+
 
     def add_arguments(self, parser):
-        parser.add_argument('total', type=int, help='Indicates the number of participants to be created')
+        # parser.add_argument('total', type=int, help='Indicates the number of participants to be created')
+        parser.add_argument('total', action="extend", nargs=2, type=int, help="Indicates the number of participants to be created for id event")
 
     def handle(self, *args, **options):
         total = options['total']
@@ -25,9 +28,12 @@ class Command(BaseCommand):
         # postfix kolejnej wartości
         # https://docs.python.org/3.9/library/string.html
         # postfix = "{:0>5}".format(str(ostatni + 1))
-        EVENT_ID = 3
+
         formatedDate = datetime.now(tz=timezone.utc)
-        for i in range(total):
+
+        print("create_participant")
+
+        for i in range(total[0]):
             postfix = str("{:0>5}".format(str(ostatni + 1 + i)))
             # print(i + 1)
             Participant.objects.create(
@@ -35,7 +41,7 @@ class Command(BaseCommand):
                 mail="p_" + postfix + "@p.pl",
                 date_change_status=formatedDate,
                 created=formatedDate,
-                event=Event.objects.get(pk=EVENT_ID)
+                event=Event.objects.get(pk=total[1])
             )
 
-        self.stdout.write(self.style.SUCCESS(f"dopisane {total} rekordów"))
+        self.stdout.write(self.style.SUCCESS(f"dopisane {total[0]} rekordów"))
