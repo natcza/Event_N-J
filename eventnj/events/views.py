@@ -4,6 +4,10 @@ from django.views import View
 from .models import Event, Participant
 from .forms import addParticipantForm
 
+from django.utils import timezone
+from datetime import datetime
+
+
 # Create your views here.
 
 class DashboardView(View):
@@ -32,14 +36,16 @@ class EventDetailsView(View):
         return render(request, self.template_name, ctx)
 
 
+# https://docs.djangoproject.com/en/3.2/ref/class-based-views/
 class ParticipantAddView(View):
     template_name = 'addParticipant_view.html'
 
     def get(self, request, *args, **kwargs):
         form = addParticipantForm()
 
-        event_id = kwargs['pk']
-        event = get_object_or_404(Event, pk=event_id)
+        # event_id = kwargs['pk']
+
+        # event = get_object_or_404(Event, pk=event_id)
 
         return render(request, self.template_name, {'form': form})
 
@@ -52,14 +58,19 @@ class ParticipantAddView(View):
             name = form.cleaned_data.get('name')
             mail = form.cleaned_data.get('mail')
 
+            formatedDate = datetime.now(tz=timezone.utc)
+
             participant = Participant()
             participant.name = name
             participant.mail = mail
-            # participant.event = event
-            # .save()
+            participant.date_change_status = formatedDate
+            # participant.created = formatedDate
+            participant.event = event
+            participant.save()
 
             # tu nie możemy przesłać kontekstu
-
+            # wracamy do listy eventów
             # return redirect('student', student_id=student.id)  # -> przekieruj na stronę
+            return redirect('dashboard')  # -> przekieruj na stronę
 
         return render(request, self.template_name, {'form': form})  # tu możemy przekazać kontekst
