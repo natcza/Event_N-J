@@ -26,5 +26,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', DashboardView.as_view(), name="dashboard"),
     path('event-details/<int:pk>', EventDetailsView.as_view(), name="event-details"),
-    path('add-participant/', ParticipantAddView.as_view(), name="add-participant"),
+    path('add-participant/<int:pk>', ParticipantAddView.as_view(), name="add-participant"),
 ]

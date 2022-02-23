@@ -38,13 +38,15 @@ class ParticipantAddView(View):
     def get(self, request, *args, **kwargs):
         form = addParticipantForm()
 
-        # event_id = kwargs['pk']
-        # event = get_object_or_404(Event, pk=event_id)
+        event_id = kwargs['pk']
+        event = get_object_or_404(Event, pk=event_id)
 
         return render(request, self.template_name, {'form': form})
 
     def post(self, request, *args, **kwargs):
         form = addParticipantForm(request.POST)
+        event_id = kwargs['pk']
+        event = get_object_or_404(Event, pk=event_id)
 
         if form.is_valid():
             name = form.cleaned_data.get('name')
