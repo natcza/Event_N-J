@@ -38,15 +38,22 @@ class EventDetailsView(View):
         }
         return render(request, self.template_name, ctx)
 
+# https://ccbv.co.uk/projects/Django/3.2/django.views.generic.edit/FormView/
+
 class ParticipantAddView2(FormView):
+    """Dodaj jedneuczestnika do eventu"""
     form_class = AddParticipantForm
+
+    # https://www.fullstackpython.com/django-urls-reverse-lazy-examples.html
     success_url = reverse_lazy('dashboard')
     template_name = 'addParticipant_view.html'
 
     def form_valid(self, form):
+        # This method is called when valid form data has been POSTed.
         event_id = self.kwargs['pk']
 
         event = get_object_or_404(Event, pk=event_id)
+
 
 
         name = form.cleaned_data.get('name')
@@ -55,6 +62,10 @@ class ParticipantAddView2(FormView):
         # modelForm
         # event którego nie ma
 
+        ''' uczestnik jeste nie jest określony 
+            czy należy do listy dodatkowej czy rezerwowej
+            przypisanie po zamknięciu rezerwacji
+        '''
         participant = Participant()
         participant.name = name
         participant.mail = mail
@@ -62,6 +73,12 @@ class ParticipantAddView2(FormView):
         # participant.created = formatedDate
         participant.event = event
         participant.save()
+
+        # ToDo
+        # sending an email after pressing send button Dodaj
+        # jak sprawdzić czy dane są zapisane
+        # form.send_email()
+
         return super().form_valid(form)
 
 
