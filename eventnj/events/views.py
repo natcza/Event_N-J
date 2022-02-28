@@ -1,6 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
 from django.views.generic import FormView
+
+from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 
 from .models import Event, Participant
@@ -21,6 +23,42 @@ class DashboardView(View):
             "events": events,
         }
         return render(request, self.template_name, ctx)
+
+class EventDetailsView_(DetailView):
+    model = Event
+    template_name = 'event_details_view.html'
+
+    def dispatch(self, request, *args, **kwargs):
+
+        # try:
+        print(kwargs)
+        # breakpoint()
+
+        obj = super().dispatch(request, *args, **kwargs)
+        # print(obj)
+        # except Event.DoesNotExist:
+        #     raise Http404('dupa, nie ma Eventu')
+
+        return obj
+    # def get_context_data(self, **kwargs):
+    #     # breakpoint()
+    #     print(self.object)
+    #     context = super().get_context_data(**kwargs)
+    #
+    #     return context
+    # def get_object(self, queryset=None):
+    #     # breakpoint()
+    #     # if queryset is None:
+    #     #     queryset = self.get_queryset()
+    #
+    #
+    #     try:
+    #         obj = super().get_object()
+    #     except Event.DoesNotExist:
+    #
+    #         raise Http404('dupa nie ma Eventu')
+    #
+    #     return obj
 
 
 class EventDetailsView(View):

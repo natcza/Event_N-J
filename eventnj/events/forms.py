@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.forms import widgets, ModelForm
 
 
+
 class AddParticipantForm(forms.Form):
     name = forms.CharField(label="Imię ", max_length=255)
     mail = forms.CharField(label="email ", max_length=255)
