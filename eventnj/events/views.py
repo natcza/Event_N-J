@@ -1,3 +1,5 @@
+import logging
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
 from django.views.generic import FormView
@@ -9,13 +11,13 @@ from .models import Event, Participant
 from .forms import AddParticipantForm
 
 from django.utils import timezone
-
-
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import send_mail
 
 # Create your views here.
 
 class DashboardView(View):
-    template_name = "dashboard.html"
+    template_name = "events/dashboard.html"
 
     def get(self, request, *args, **kwargs):
         events = Event.objects.all().order_by("start")
@@ -24,46 +26,63 @@ class DashboardView(View):
         }
         return render(request, self.template_name, ctx)
 
+# class EventDetailsView_(DetailView):
+#     model = Event
+#     template_name = 'event_details_view.html'
+#
+#     def dispatch(self, request, *args, **kwargs):
+#
+#         # try:
+#         print(kwargs)
+#         # breakpoint()
+#
+#         obj = super().dispatch(request, *args, **kwargs)
+#         # print(obj)
+#         # except Event.DoesNotExist:
+#         #     raise Http404('dupa, nie ma Eventu')
+#
+#         return obj
+#     # def get_context_data(self, **kwargs):
+#     #     # breakpoint()
+#     #     print(self.object)
+#     #     context = super().get_context_data(**kwargs)
+#     #
+#     #     return context
+#     # def get_object(self, queryset=None):
+#     #     # breakpoint()
+#     #     # if queryset is None:
+#     #     #     queryset = self.get_queryset()
+#     #
+#     #
+#     #     try:
+#     #         obj = super().get_object()
+#     #     except Event.DoesNotExist:
+#     #
+#     #         raise Http404('dupa nie ma Eventu')
+#     #
+#     #     return obj
+
+
+
 class EventDetailsView_(DetailView):
     model = Event
-    template_name = 'event_details_view.html'
+    template_name = 'events/event_details_view.html'
 
-    def dispatch(self, request, *args, **kwargs):
 
-        # try:
-        print(kwargs)
-        # breakpoint()
+    # template_name = 'event_details_view.html'
 
-        obj = super().dispatch(request, *args, **kwargs)
-        # print(obj)
-        # except Event.DoesNotExist:
-        #     raise Http404('dupa, nie ma Eventu')
+    # def dispatch(self, request, *args, **kwargs):
+    #     # event_slug = self.kwargs.get("slug")
+    #     self.event = get_object_or_404(Event)
+    #     return super().dispatch(request, *args, **kwargs)
 
-        return obj
     # def get_context_data(self, **kwargs):
-    #     # breakpoint()
-    #     print(self.object)
-    #     context = super().get_context_data(**kwargs)
-    #
-    #     return context
-    # def get_object(self, queryset=None):
-    #     # breakpoint()
-    #     # if queryset is None:
-    #     #     queryset = self.get_queryset()
-    #
-    #
-    #     try:
-    #         obj = super().get_object()
-    #     except Event.DoesNotExist:
-    #
-    #         raise Http404('dupa nie ma Eventu')
-    #
-    #     return obj
-
+    # context = super().get_context_data(**kwargs)
+        # return context
 
 class EventDetailsView(View):
     """Funkcja wyswietlajaca opis jednego Eventu"""
-    template_name = 'event_details_view.html'
+    template_name = 'events/event_details_view.html'
 
     # test stworzyc pizze kotra ma sie zwrocic
     def get(self, request, *args, **kwargs):
@@ -84,15 +103,12 @@ class ParticipantAddView2(FormView):
 
     # https://www.fullstackpython.com/django-urls-reverse-lazy-examples.html
     success_url = reverse_lazy('dashboard')
-    template_name = 'addParticipant_view.html'
+    template_name = 'events/addParticipant_view.html'
 
     def form_valid(self, form):
         # This method is called when valid form data has been POSTed.
         event_id = self.kwargs['pk']
-
         event = get_object_or_404(Event, pk=event_id)
-
-
 
         name = form.cleaned_data.get('name')
         mail = form.cleaned_data.get('mail')
@@ -111,8 +127,14 @@ class ParticipantAddView2(FormView):
         # participant.created = formatedDate
         participant.event = event
         participant.save()
-
-        # ToDo
+        send_mail(
+            'Invitation to Event',
+            'We would like to invite you to event1.',
+            'from@example.com',
+            [mail],
+        )
+        # ToDo Connecting with MAILHOG --> SETTINGS
+        # Adding HTML and Activation code uuid
         # sending an email after pressing send button Dodaj
         # jak sprawdzić czy dane są zapisane
         # form.send_email()
@@ -123,7 +145,7 @@ class ParticipantAddView2(FormView):
 
 # https://docs.djangoproject.com/en/3.2/ref/class-based-views/
 class ParticipantAddView(View):
-    template_name = 'addParticipant_view.html'
+    template_name = 'events/addParticipant_view.html'
 
     def get(self, request, *args, **kwargs):
         form = AddParticipantForm()
