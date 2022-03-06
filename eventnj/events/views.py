@@ -128,10 +128,12 @@ class ParticipantAddView2(FormView):
         participant.event = event
         participant.save()
         send_mail(
-            'Invitation to Event',
-            'We would like to invite you to event1.',
-            'from@example.com',
-            [mail],
+            subject = f'Invitation to Event: {event.title}',
+            message = f'We would like to invite you to {event.title}. '
+                      f'If you want to active your account please click the link {participant.authentication_code}',
+            from_email='from@example.com',
+            recipient_list = [mail],
+
         )
         # ToDo Connecting with MAILHOG --> SETTINGS
         # Adding HTML and Activation code uuid

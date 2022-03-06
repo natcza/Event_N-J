@@ -11,12 +11,6 @@ class AddParticipantForm(forms.Form):
     # defaultowo required jest false
     accept_rodo = forms.BooleanField()
 
-    def send_email(self):
-        #  czy ciało funkcji musi być w forms-ie
-        #  jakie to ma konsekwencje?
-        #  https://docs.djangoproject.com/en/3.2/ref/class-based-views/generic-editing/#django.views.generic.edit.FormView
-        pass
-
     # https://www.youtube.com/watch?v=pFMrOpDs4QQ
     # accept_rodo = forms.BooleanField(label='accept rodo', help_text='zaakceptuj warunki rodo')
 
