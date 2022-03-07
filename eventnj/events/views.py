@@ -14,6 +14,8 @@ from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 
+from django.core.mail import EmailMessage
+
 # Create your views here.
 
 class DashboardView(View):
@@ -127,14 +129,33 @@ class ParticipantAddView2(FormView):
         # participant.created = formatedDate
         participant.event = event
         participant.save()
-        send_mail(
-            subject = f'Invitation to Event: {event.title}',
-            message = f'We would like to invite you to {event.title}. '
-                      f'If you want to active your account please click the link {participant.authentication_code}',
+        # send_mail(
+        #     subject = f'Invitation to Event: {event.title}',
+        #     message = f'We would like to invite you to {event.title}. '
+        #               f'If you want to active your account please click the link {participant.authentication_code}',
+        #     from_email='from@example.com',
+        #     recipient_list = [mail],
+        #
+        # )
+        text_content = f'We would like to invite you to {event.title}. '
+        html_content = f'<p>We would like to invite you to <strong>{event.title}</strong> message.</p>'
+        email = EmailMessage(
+            subject=f'Invitation to Event - EmailMessage: {event.title}',
+            body=html_content,
             from_email='from@example.com',
-            recipient_list = [mail],
-
+            to =[mail],
+            reply_to=['another@example.com'],
+            headers={'Message-ID': 'foo'},
         )
+        # email.attach_alternative(html_content, "text/html")
+        email.content_subtype = "html"
+        # jak używać naprzemiennie plain text i html-a
+        #  jak używać MIME
+
+        email.send()
+
+
+
         # ToDo Connecting with MAILHOG --> SETTINGS
         # Adding HTML and Activation code uuid
         # sending an email after pressing send button Dodaj
