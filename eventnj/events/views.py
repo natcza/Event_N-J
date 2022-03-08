@@ -15,7 +15,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 
 from django.core.mail import EmailMessage
+from django.core.mail import EmailMultiAlternatives
 
+from django.template.loader import render_to_string
 
 # Create your views here.
 
@@ -141,20 +143,29 @@ class ParticipantAddView2(FormView):
         # )
         text_content = f'We would like to invite you to {event.title}. '
         html_content = f'<p>We would like to invite you to <strong>{event.title}</strong> message.</p>'
-        email = EmailMessage(
-            subject=f'Invitation to Event - EmailMessage: {event.title}',
-            body=html_content,
-            from_email='from@example.com',
-            to=[mail],
-            reply_to=['another@example.com'],
-            headers={'Message-ID': 'Message-ID'},
-        )
+        # email = EmailMessage(
+        #     subject=f'Invitation to Event - EmailMessage: {event.title}',
+        #     body=html_content,
+        #     from_email='from@example.com',
+        #     to=[mail],
+        #     reply_to=['another@example.com'],
+        #     headers={'Message-ID': 'Message-ID'},
+        # )
         # email.attach_alternative(html_content, "text/html")
-        email.content_subtype = "html"
+        # email.content_subtype = "html"
         # jak używać naprzemiennie plain text i html-a
         #  jak używać MIME
+        msg = EmailMultiAlternatives(
+            f'Invitation to Event - EmailMessage: {event.title}',
+            text_content,
+            'from@example.com',
+            [mail]
+        )
 
-        email.send()
+        html_content = render_to_string('events/test.html', {'event': event})
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
+        # email.send()
 
         # ToDo Connecting with MAILHOG --> SETTINGS
         # Adding HTML and Activation code uuid
