@@ -16,6 +16,7 @@ from django.core.mail import send_mail
 
 from django.core.mail import EmailMessage
 
+
 # Create your views here.
 
 class DashboardView(View):
@@ -27,6 +28,7 @@ class DashboardView(View):
             "events": events,
         }
         return render(request, self.template_name, ctx)
+
 
 # class EventDetailsView_(DetailView):
 #     model = Event
@@ -65,11 +67,9 @@ class DashboardView(View):
 #     #     return obj
 
 
-
 class EventDetailsView_(DetailView):
     model = Event
     template_name = 'events/event_details_view.html'
-
 
     # template_name = 'event_details_view.html'
 
@@ -80,7 +80,8 @@ class EventDetailsView_(DetailView):
 
     # def get_context_data(self, **kwargs):
     # context = super().get_context_data(**kwargs)
-        # return context
+    # return context
+
 
 class EventDetailsView(View):
     """Funkcja wyswietlajaca opis jednego Eventu"""
@@ -96,6 +97,7 @@ class EventDetailsView(View):
             'event': event,
         }
         return render(request, self.template_name, ctx)
+
 
 # https://ccbv.co.uk/projects/Django/3.2/django.views.generic.edit/FormView/
 
@@ -143,9 +145,9 @@ class ParticipantAddView2(FormView):
             subject=f'Invitation to Event - EmailMessage: {event.title}',
             body=html_content,
             from_email='from@example.com',
-            to =[mail],
+            to=[mail],
             reply_to=['another@example.com'],
-            headers={'Message-ID': 'foo'},
+            headers={'Message-ID': 'Message-ID'},
         )
         # email.attach_alternative(html_content, "text/html")
         email.content_subtype = "html"
@@ -154,8 +156,6 @@ class ParticipantAddView2(FormView):
 
         email.send()
 
-
-
         # ToDo Connecting with MAILHOG --> SETTINGS
         # Adding HTML and Activation code uuid
         # sending an email after pressing send button Dodaj
@@ -163,7 +163,6 @@ class ParticipantAddView2(FormView):
         # form.send_email()
 
         return super().form_valid(form)
-
 
 
 # https://docs.djangoproject.com/en/3.2/ref/class-based-views/
