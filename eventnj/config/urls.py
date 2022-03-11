@@ -16,6 +16,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from events.views import (
+    DashboardView,
+    EventDetailsView,
+    EventDetailsView_,
+    ParticipantAddView2
+)
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', DashboardView.as_view(), name="dashboard"),
+    path('event-details/<int:pk>/', EventDetailsView_.as_view(), name="event-details"),
+    # path('add-participant/<int:pk>', ParticipantAddView.as_view(), name="add-participant"),
+    path('add-participant/<int:pk>/', ParticipantAddView2.as_view(), name="add-participant"),
 ]

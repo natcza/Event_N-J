@@ -1,0 +1,10 @@
+
+python3 manage.py shell
+from events.models import Participant, Event, Organizer, Status_Participant, Photo
+
+o1 = Organizer.objects.create(name="organizer1", description="description_organizer_1", mail="organizer1@.o2.pl")
+o1.save() --> save
+o2 = Organizer.objects.create(name="organizer2", description="description_organizer_2", mail="organizer2@.o2.pl")
+o3 = Organizer.objects.create(name="organizer3", description="description_organizer_3", mail="organizer3@.o2.pl")
+o4 = Organizer.objects.create(name="organizer4", description="description_organizer_4", mail="organizer4@.o2.pl")
+
