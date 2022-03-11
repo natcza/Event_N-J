@@ -172,6 +172,7 @@ class ParticipantAddView2(FormView):
         # sending an email after pressing send button Dodaj
         # jak sprawdzić czy dane są zapisane
         # form.send_email()
+        # TODO Autentiction view --> Participant activation code
 
         return super().form_valid(form)
 
