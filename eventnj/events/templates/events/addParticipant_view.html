@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<form action="#" method="post">
+    {% csrf_token %}
+
+    {{ form.as_p}}<br/>
+
+    <input type="submit" value="Dodaj"/>
+</form>
+<br>
+<br>
+
+    <a href="{% url 'dashboard' %}"> << Powrot do listy Eventów  </a>
+{% endblock %}
