@@ -13,6 +13,8 @@ uruchomienie linka -> walidacja:
 - **(View) -> (FormView)**
 - czy właściwości zapisywać w osobych metaklasach?
 
+czy tworzyć osobne metody związane ze zmianą stanu atrybutów? a może je obudowywać metaklasami?
+
 jak otrzymywać informacje o hoście?
 czy ma być gdzieś zapisywany
 
