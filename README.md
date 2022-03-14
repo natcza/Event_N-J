@@ -10,7 +10,7 @@ uruchomienie linka -> walidacja:
 - przy zmianie na dowolny string
 - przy próbie powtórnego uruchomienia linka
 
-- (View) -> (FormView)
+- **(View) -> (FormView)**
 - czy właściwości zapisywać w osobych metaklasach?
 
 jak otrzymywać informacje o hoście?
