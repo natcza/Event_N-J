@@ -1,11 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-    <h2>Title</h2>
-    <p>We would like to invite you to <strong>{{event.title}}</strong> <br />message.</p>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<!--    <h2>Title</h2>-->
+<!--    <p>We would like to invite you to <strong>{{event.title}}</strong> <br />message.</p>-->
+    <p>Invitation to event: <strong>{{ event.title }}</strong>, <br /> link: {{ str_link }}</p>>
+
+
+
+
+{% endblock %}

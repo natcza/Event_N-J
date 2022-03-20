@@ -5,10 +5,7 @@ from django.views import View
 from django.views.generic import FormView
 
 from django.views.generic.detail import DetailView
-from django.urls import reverse_lazy
-
-from .models import Event, Participant
-from .forms import AddParticipantForm
+from django.urls import reverse_lazy, reverse
 
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
@@ -18,6 +15,23 @@ from django.core.mail import EmailMessage
 from django.core.mail import EmailMultiAlternatives
 
 from django.template.loader import render_to_string
+
+from uuid import UUID
+from config.settings import HOST
+
+
+from .models import Event, Participant
+from .forms import AddParticipantForm
+
+from .models import (
+    SP_IS_NEW,
+    SP_IS_ACTIVE_MAIL,
+    SP_IS_DEACTIVATE_MAIL,
+    SP_IS_ACTIVE_EVENT,
+    SP_IS_DEACTIVATE_EVENT,
+    STATUS_PARTICIPANT,
+)
+
 
 # Create your views here.
 
@@ -85,21 +99,24 @@ class EventDetailsView_(DetailView):
     # return context
 
 
-class EventDetailsView(View):
-    """Funkcja wyswietlajaca opis jednego Eventu"""
-    template_name = 'events/event_details_view.html'
+# class EventDetailsView(View):
+#     """Funkcja wyswietlajaca opis jednego Eventu"""
+#     template_name = 'events/event_details_view.html'
+#
+#     # test stworzyc pizze kotra ma sie zwrocic
+#     def get(self, request, *args, **kwargs):
+#         event_id = kwargs['pk']
+#         # breakpoint()
+#         event = get_object_or_404(Event, pk=event_id)
+#
+#         ctx = {
+#             'event': event,
+#         }
+#         return render(request, self.template_name, ctx)
 
-    # test stworzyc pizze kotra ma sie zwrocic
-    def get(self, request, *args, **kwargs):
-        event_id = kwargs['pk']
-        # breakpoint()
-        event = get_object_or_404(Event, pk=event_id)
-
-        ctx = {
-            'event': event,
-        }
-        return render(request, self.template_name, ctx)
-
+class SendMailView(DetailView):
+    template_name = 'events/info_send_mail.html'
+    model = Event
 
 # https://ccbv.co.uk/projects/Django/3.2/django.views.generic.edit/FormView/
 
@@ -108,7 +125,8 @@ class ParticipantAddView2(FormView):
     form_class = AddParticipantForm
 
     # https://www.fullstackpython.com/django-urls-reverse-lazy-examples.html
-    success_url = reverse_lazy('dashboard')
+    # success_url = reverse('dashboard')
+    # success_url = reverse_lazy('send-mail')
     template_name = 'events/addParticipant_view.html'
 
     def form_valid(self, form):
@@ -132,6 +150,7 @@ class ParticipantAddView2(FormView):
         participant.date_change_status = timezone.now()
         # participant.created = formatedDate
         participant.event = event
+        participant.status = SP_IS_NEW
         participant.save()
         # send_mail(
         #     subject = f'Invitation to Event: {event.title}',
@@ -143,6 +162,8 @@ class ParticipantAddView2(FormView):
         # )
         text_content = f'We would like to invite you to {event.title}. '
         html_content = f'<p>We would like to invite you to <strong>{event.title}</strong> message.</p>'
+        # wygeneruj link aktywacyjny
+
         # email = EmailMessage(
         #     subject=f'Invitation to Event - EmailMessage: {event.title}',
         #     body=html_content,
@@ -155,14 +176,21 @@ class ParticipantAddView2(FormView):
         # email.content_subtype = "html"
         # jak używać naprzemiennie plain text i html-a
         #  jak używać MIME
+
+        # TODO Autentiction view --> Participant activation code
+        # Link powiniem być postaci:
+        # http://127.0.0.1:8000/authenticate-participant/3bf0561aeabf4c49b4fb3b81fb5e08ba/
+        # django site
+        str_link = f'http://{HOST}/authenticate-participant/{participant.authentication_code}'
         msg = EmailMultiAlternatives(
-            f'Invitation to Event - EmailMessage: {event.title}',
+            f'Invitation to event: {event.title}, link: {str_link}',
             text_content,
             'from@example.com',
             [mail]
         )
 
-        html_content = render_to_string('events/test.html', {'event': event})
+
+        html_content = render_to_string('events/test.html', {'event': event, 'str_link': str_link})
         msg.attach_alternative(html_content, "text/html")
         msg.send()
         # email.send()
@@ -172,10 +200,14 @@ class ParticipantAddView2(FormView):
         # sending an email after pressing send button Dodaj
         # jak sprawdzić czy dane są zapisane
         # form.send_email()
-        # TODO Autentiction view --> Participant activation code
-
         return super().form_valid(form)
 
+    # https://stackoverflow.com/questions/46184193/how-to-reverse-lazy-to-a-view-url-with-variable
+    def get_success_url(self):
+        eventid = self.kwargs['pk']
+
+        # self.success_url)  # success_url may be lazy
+        return reverse_lazy('send-mail', kwargs={'pk': eventid})
 
 # https://docs.djangoproject.com/en/3.2/ref/class-based-views/
 class ParticipantAddView(View):
@@ -212,6 +244,70 @@ class ParticipantAddView(View):
             # tu nie możemy przesłać kontekstu
             # wracamy do listy eventów
             # return redirect('student', student_id=student.id)  # -> przekieruj na stronę
-            return redirect('dashboard')  # -> przekieruj na stronę
+            # return redirect('dashboard')  # -> przekieruj na stronę
+            return redirect('send-mail')  # -> przekieruj na stronę
+
 
         return render(request, self.template_name, {'form': form})  # tu możemy przekazać kontekst
+
+
+class AuthenticateParticipantView(View):
+    template_name = 'events/authenticateParticipant_view.html'
+
+
+    def get(self, request, *args, **kwargs):
+        # authenticate_code
+        authenticate_code = kwargs['authenticate_code']
+
+        # https://gist.github.com/ShawnMilo/7777304
+        # uuid.UUID('302a4299-736e-4ef3-84fc-a9f400e84b24').version
+        # czy authenticate_code jest uuid
+        print(f"----  sprawdzaj UUID")
+
+        # try:
+        #     val = UUID(authenticate_code)
+        # except ValueError:
+        #     msg = f"{authenticate_code} is not uuid"
+        #     print(msg)
+        #     ctx = {
+        #         "msg": msg,
+        #     }
+        #     return render(request, self.template_name, ctx)
+
+        print(f"kwargs -->: {kwargs}")
+
+        participant = get_object_or_404(Participant, authentication_code=authenticate_code)
+        print(f"----  sprawdzaj status")
+
+        # sprawdzaj czy już wcześniej nastąpiła zmiana statusu
+        if participant.status == SP_IS_ACTIVE_MAIL:
+            msg = f"próba ponownego aktywowania maila"
+            print(msg)
+            ctx = {
+                "msg": msg,
+            }
+            return render(request, self.template_name, ctx)
+
+        print(f"----  zmień status")
+        # zmień status
+        participant.status = SP_IS_ACTIVE_MAIL
+        participant.date_change_status = timezone.now()
+
+        print(f"----  zachowaj zmiany")
+        participant.save()
+        # setStatus()
+        # zmiana rezerwacji
+
+        ctx = {
+            "participant": participant
+        }
+
+        return render(request, self.template_name, ctx)
+
+    # def post(self, request, *args, **kwargs):
+    #
+    #     authenticate_code = kwargs['aauthentication_code']
+    #     participant = get_object_or_404(Participant, authentication_code=authenticate_code)
+    #
+    #     ctx = {}
+    #     return render(request, self.template_name, ctx)  # tu możemy przekazać kontekst
