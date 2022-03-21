@@ -10,7 +10,7 @@ from django.urls import reverse_lazy, reverse
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
-
+from django.http import Http404
 from django.core.mail import EmailMessage
 from django.core.mail import EmailMultiAlternatives
 
@@ -282,12 +282,13 @@ class AuthenticateParticipantView(View):
         # sprawdzaj czy już wcześniej nastąpiła zmiana statusu
         if participant.status == SP_IS_ACTIVE_MAIL:
             # tu musi nastąpić błąd 404
-            msg = f"próba ponownego aktywowania maila"
-            print(msg)
-            ctx = {
-                "msg": msg,
-            }
-            return render(request, self.template_name, ctx)
+            raise Http404('Question does not exists')
+            # msg = f"próba ponownego aktywowania maila"
+            # print(msg)
+            # ctx = {
+            #     "msg": msg,
+            # }
+            # return render(request, self.template_name, ctx)
 
         print(f"----  zmień status")
         # zmień status
