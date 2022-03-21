@@ -281,6 +281,7 @@ class AuthenticateParticipantView(View):
 
         # sprawdzaj czy już wcześniej nastąpiła zmiana statusu
         if participant.status == SP_IS_ACTIVE_MAIL:
+            # tu musi nastąpić błąd 404
             msg = f"próba ponownego aktywowania maila"
             print(msg)
             ctx = {
