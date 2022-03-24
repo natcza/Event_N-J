@@ -1,5 +1,5 @@
 import logging
-
+from django.views.generic import DetailView
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
 from django.views.generic import FormView
@@ -251,11 +251,16 @@ class ParticipantAddView(View):
         return render(request, self.template_name, {'form': form})  # tu możemy przekazać kontekst
 
 
-class AuthenticateParticipantView(View):
+class AuthenticateParticipantView(DetailView):
     template_name = 'events/authenticateParticipant_view.html'
+    model = Participant
+    # query_pk_and_slug = False
+    # query_pk_and_slug = "authenticate_code"
+    slug_field = 'authentication_code'
+    slug_url_kwarg = 'authenticate_code'
 
 
-    def get(self, request, *args, **kwargs):
+    def getup(self, request, *args, **kwargs):
         # authenticate_code
         authenticate_code = kwargs['authenticate_code']
 
