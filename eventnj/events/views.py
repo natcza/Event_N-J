@@ -259,6 +259,22 @@ class AuthenticateParticipantView(DetailView):
     slug_field = 'authentication_code'
     slug_url_kwarg = 'authenticate_code'
 
+    def get(self, request, *args, **kwargs):
+
+        self.object = self.get_object()
+        participant = self.object
+
+        if participant.status == SP_IS_ACTIVE_MAIL:
+            raise Http404('Question does not exists')
+
+        participant.status = SP_IS_ACTIVE_MAIL
+        participant.date_change_status = timezone.now()
+        participant.save()
+
+        self.object = participant
+
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
 
     def getup(self, request, *args, **kwargs):
         # authenticate_code
