@@ -1,5 +1,5 @@
 import logging
-
+from django.views.generic import DetailView
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
 from django.views.generic import FormView
@@ -251,65 +251,29 @@ class ParticipantAddView(View):
         return render(request, self.template_name, {'form': form})  # tu możemy przekazać kontekst
 
 
-class AuthenticateParticipantView(View):
+class AuthenticateParticipantView(DetailView):
     template_name = 'events/authenticateParticipant_view.html'
-
+    model = Participant
+    # query_pk_and_slug = False
+    # query_pk_and_slug = "authenticate_code"
+    slug_field = 'authentication_code'
+    slug_url_kwarg = 'authenticate_code'
 
     def get(self, request, *args, **kwargs):
-        # authenticate_code
-        authenticate_code = kwargs['authenticate_code']
 
-        # https://gist.github.com/ShawnMilo/7777304
-        # uuid.UUID('302a4299-736e-4ef3-84fc-a9f400e84b24').version
-        # czy authenticate_code jest uuid
-        print(f"----  sprawdzaj UUID")
+        self.object = self.get_object()
+        participant = self.object
 
-        # try:
-        #     val = UUID(authenticate_code)
-        # except ValueError:
-        #     msg = f"{authenticate_code} is not uuid"
-        #     print(msg)
-        #     ctx = {
-        #         "msg": msg,
-        #     }
-        #     return render(request, self.template_name, ctx)
-
-        print(f"kwargs -->: {kwargs}")
-
-        participant = get_object_or_404(Participant, authentication_code=authenticate_code)
-        print(f"----  sprawdzaj status")
-
-        # sprawdzaj czy już wcześniej nastąpiła zmiana statusu
         if participant.status == SP_IS_ACTIVE_MAIL:
-            # tu musi nastąpić błąd 404
             raise Http404('Question does not exists')
-            # msg = f"próba ponownego aktywowania maila"
-            # print(msg)
-            # ctx = {
-            #     "msg": msg,
-            # }
-            # return render(request, self.template_name, ctx)
 
-        print(f"----  zmień status")
-        # zmień status
         participant.status = SP_IS_ACTIVE_MAIL
         participant.date_change_status = timezone.now()
-
-        print(f"----  zachowaj zmiany")
         participant.save()
-        # setStatus()
-        # zmiana rezerwacji
 
-        ctx = {
-            "participant": participant
-        }
+        self.object = participant
 
-        return render(request, self.template_name, ctx)
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
 
-    # def post(self, request, *args, **kwargs):
-    #
-    #     authenticate_code = kwargs['aauthentication_code']
-    #     participant = get_object_or_404(Participant, authentication_code=authenticate_code)
-    #
-    #     ctx = {}
-    #     return render(request, self.template_name, ctx)  # tu możemy przekazać kontekst
+
