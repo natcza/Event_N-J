@@ -1,5 +1,10 @@
 from django.db import models
 import uuid
+# from config.settings import HOST
+from django.conf import settings
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+
 
 SE_PENDING = 1
 SE_PUBLISHED = 2
@@ -41,6 +46,22 @@ class Participant(models.Model):
     identification_code = models.UUIDField(editable=False, default=uuid.uuid4, unique=True)
     created = models.DateTimeField(auto_now_add=True)
     event = models.ForeignKey("Event", related_name="participants", on_delete=models.CASCADE)
+
+    def invite_by_email(self):
+        text_content = f'We would like to invite you to {self.event.title}. '
+        html_content = f'<p>We would like to invite you to <strong>{self.event.title}</strong> message.</p>'
+        str_link = f'http://{settings.HOST}/authenticate-participant/{self.authentication_code}'
+        msg = EmailMultiAlternatives(
+            f'Invitation to event: {self.event.title}, link: {str_link}',
+            text_content,
+            'from@example.com',
+            [self.mail]
+        )
+
+        html_content = render_to_string('events/test.html', {'event': self.event, 'str_link': str_link})
+        msg.attach_alternative(html_content, "text/html")
+        return msg.send()
+
 
 class Event(models.Model):
     title = models.CharField(max_length=255)
