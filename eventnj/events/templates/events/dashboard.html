@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    {% if message %}
+	    <h4>{{ message }}</h4>
+    {% endif %}
+
+    List of Events:
+    <ul>
+    {% for event in events %}
+        <li><a href='/event-details/{{ event.pk }}'>{{ event.title }}</a></li>
+    {% endfor %}
+
+    </ul>
+{% endblock %}

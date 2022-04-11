@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% if message %}
+	    <h4>{{ message }}</h4>
+    {% endif %}
+
+    <h1>Event </h1><br>
+    nazwa: {{ event.title }}<br>
+    cena: {{ event.price }} zł<br>
+    opis: {{ event.description }}<br>
+
+<br>
+<br>
+    <h3>
+        Właśnie przesłaliśmy do Ciebie email <br />
+        w którym znajdziesz potwierdzenie swojej autentyczności.
+    </h3>
+
+    <br>
+    <br>
+    <a href="{% url 'dashboard' %}"> << Powrot do listy Eventów  </a>
+
+{% endblock %}

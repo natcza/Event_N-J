@@ -16,6 +16,23 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from events.views import (
+    DashboardView,
+    # EventDetailsView,
+    SendMailView,
+    EventDetailsView_,
+    ParticipantAddView2,
+    AuthenticateParticipantView
+)
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', DashboardView.as_view(), name="dashboard"),
+    path('event-details/<int:pk>/', EventDetailsView_.as_view(), name="event-details"),
+    # path('add-participant/<int:pk>', ParticipantAddView.as_view(), name="add-participant"),
+    path('add-participant/<int:pk>/', ParticipantAddView2.as_view(), name="add-participant"),
+
+    # https://docs.djangoproject.com/en/4.0/topics/http/urls/#path-converters
+    path('authenticate-participant/<uuid:authenticate_code>/', AuthenticateParticipantView.as_view(), name="authenticate-participant"),
+    path('send-mail/<int:pk>/', SendMailView.as_view(), name='send-mail'),
 ]
