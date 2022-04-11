@@ -1,35 +1,16 @@
-import logging
-
+from django.http import Http404
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse_lazy
+from django.utils import timezone
 from django.views import View
 from django.views.generic import FormView
-
 from django.views.generic.detail import DetailView
-from django.urls import reverse_lazy, reverse
 
-from django.utils import timezone
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.mail import send_mail
-from django.http import Http404
-from django.core.mail import EmailMessage
-from django.core.mail import EmailMultiAlternatives
-
-from django.template.loader import render_to_string
-
-from uuid import UUID
-from config.settings import HOST
-
-
-from .models import Event, Participant
 from .forms import AddParticipantForm
-
+from .models import Event, Participant
 from .models import (
     SP_IS_NEW,
     SP_IS_ACTIVE_MAIL,
-    SP_IS_DEACTIVATE_MAIL,
-    SP_IS_ACTIVE_EVENT,
-    SP_IS_DEACTIVATE_EVENT,
-    STATUS_PARTICIPANT,
 )
 
 
@@ -118,6 +99,7 @@ class SendMailView(DetailView):
     template_name = 'events/info_send_mail.html'
     model = Event
 
+
 # https://ccbv.co.uk/projects/Django/3.2/django.views.generic.edit/FormView/
 
 class ParticipantAddView2(FormView):
@@ -148,58 +130,10 @@ class ParticipantAddView2(FormView):
         participant.name = name
         participant.mail = mail
         participant.date_change_status = timezone.now()
-        # participant.created = formatedDate
         participant.event = event
         participant.status = SP_IS_NEW
         participant.save()
-        # send_mail(
-        #     subject = f'Invitation to Event: {event.title}',
-        #     message = f'We would like to invite you to {event.title}. '
-        #               f'If you want to active your account please click the link {participant.authentication_code}',
-        #     from_email='from@example.com',
-        #     recipient_list = [mail],
-        #
-        # )
-        text_content = f'We would like to invite you to {event.title}. '
-        html_content = f'<p>We would like to invite you to <strong>{event.title}</strong> message.</p>'
-        # wygeneruj link aktywacyjny
-
-        # email = EmailMessage(
-        #     subject=f'Invitation to Event - EmailMessage: {event.title}',
-        #     body=html_content,
-        #     from_email='from@example.com',
-        #     to=[mail],
-        #     reply_to=['another@example.com'],
-        #     headers={'Message-ID': 'Message-ID'},
-        # )
-        # email.attach_alternative(html_content, "text/html")
-        # email.content_subtype = "html"
-        # jak używać naprzemiennie plain text i html-a
-        #  jak używać MIME
-
-        # TODO Autentiction view --> Participant activation code
-        # Link powiniem być postaci:
-        # http://127.0.0.1:8000/authenticate-participant/3bf0561aeabf4c49b4fb3b81fb5e08ba/
-        # django site
-        str_link = f'http://{HOST}/authenticate-participant/{participant.authentication_code}'
-        msg = EmailMultiAlternatives(
-            f'Invitation to event: {event.title}, link: {str_link}',
-            text_content,
-            'from@example.com',
-            [mail]
-        )
-
-
-        html_content = render_to_string('events/test.html', {'event': event, 'str_link': str_link})
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()
-        # email.send()
-
-        # ToDo Connecting with MAILHOG --> SETTINGS
-        # Adding HTML and Activation code uuid
-        # sending an email after pressing send button Dodaj
-        # jak sprawdzić czy dane są zapisane
-        # form.send_email()
+        participant.invite_by_email()
         return super().form_valid(form)
 
     # https://stackoverflow.com/questions/46184193/how-to-reverse-lazy-to-a-view-url-with-variable
@@ -208,6 +142,7 @@ class ParticipantAddView2(FormView):
 
         # self.success_url)  # success_url may be lazy
         return reverse_lazy('send-mail', kwargs={'pk': eventid})
+
 
 # https://docs.djangoproject.com/en/3.2/ref/class-based-views/
 class ParticipantAddView(View):
@@ -247,13 +182,16 @@ class ParticipantAddView(View):
             # return redirect('dashboard')  # -> przekieruj na stronę
             return redirect('send-mail')  # -> przekieruj na stronę
 
-
         return render(request, self.template_name, {'form': form})  # tu możemy przekazać kontekst
 
 
-class AuthenticateParticipantView(View):
+class AuthenticateParticipantView(DetailView):
     template_name = 'events/authenticateParticipant_view.html'
-
+    model = Participant
+    # query_pk_and_slug = False
+    # query_pk_and_slug = "authenticate_code"
+    slug_field = 'authentication_code'
+    slug_url_kwarg = 'authenticate_code'
 
     def get(self, request, *args, **kwargs):
         # authenticate_code
