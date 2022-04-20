@@ -22,7 +22,8 @@ from events.views import (
     SendMailView,
     EventDetailsView_,
     ParticipantAddView2,
-    AuthenticateParticipantView
+    AuthenticateParticipantView,
+    DecisionParticipantView,
 )
 
 urlpatterns = [
@@ -35,4 +36,7 @@ urlpatterns = [
     # https://docs.djangoproject.com/en/4.0/topics/http/urls/#path-converters
     path('authenticate-participant/<uuid:authenticate_code>/', AuthenticateParticipantView.as_view(), name="authenticate-participant"),
     path('send-mail/<int:pk>/', SendMailView.as_view(), name='send-mail'),
+    path('confiramate_code/<uuid:confirmation_code>/', DecisionParticipantView.as_view(), name='decision-confirmate'),
+    path('non_confiramate_code/<uuid:non_confirmation_code>/', DecisionParticipantView.as_view(), name='decision-confirmate'),
+
 ]

@@ -11,6 +11,11 @@ from .models import Event, Participant
 from .models import (
     SP_IS_NEW,
     SP_IS_ACTIVE_MAIL,
+    SP_IS_DEACTIVATE_MAIL,
+    SP_IS_ACTIVE_EVENT,
+    SP_IS_DEACTIVATE_EVENT,
+    SP_IS_CONFIRMED,
+    SP_IS_RESIGNED,
 )
 
 
@@ -251,3 +256,24 @@ class AuthenticateParticipantView(DetailView):
     #
     #     ctx = {}
     #     return render(request, self.template_name, ctx)  # tu możemy przekazać kontekst
+
+"""
+5.1 Send E-mail with two links to one participant
+"""
+
+class DecisionParticipantView(View):
+    template_name = 'events/decision_by_mail.html'
+    def get(self, request, *args, **kwargs):
+        confirmation_code = kwargs["confirmation_code"]
+        non_confirmation_code = kwargs["non_confirmation_code"]
+        if confirmation_code != -1:
+            participant = get_object_or_404(Participant, confirmation_code=confirmation_code)
+            participant.status = SP_IS_CONFIRMED
+        else:
+            participant = get_object_or_404(Participant, non_confirmation_code=non_confirmation_code)
+            participant.status = SP_IS_RESIGNED
+        ctx = {
+            "participant": participant,
+        }
+        return render(request, self.template_name, ctx)
+

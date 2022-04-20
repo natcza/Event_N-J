@@ -21,6 +21,8 @@ SP_IS_ACTIVE_MAIL = 2
 SP_IS_DEACTIVATE_MAIL = 3
 SP_IS_ACTIVE_EVENT = 4
 SP_IS_DEACTIVATE_EVENT = 5
+SP_IS_CONFIRMED = 6
+SP_IS_RESIGNED = 7
 
 STATUS_PARTICIPANT = (
     (SP_IS_NEW, "Is_New"),
@@ -28,6 +30,8 @@ STATUS_PARTICIPANT = (
     (SP_IS_DEACTIVATE_MAIL, "Is_Deactivate_Mail"),
     (SP_IS_ACTIVE_EVENT, "Is_Active_Event"),
     (SP_IS_DEACTIVATE_EVENT, "Is_Deactivate_Event"),
+    (SP_IS_CONFIRMED, "Is_confirmed"),
+    (SP_IS_RESIGNED, "Is_resigned"),
 )
 
 # Create your models here.
@@ -59,6 +63,26 @@ class Participant(models.Model):
         )
 
         html_content = render_to_string('events/test.html', {'event': self.event, 'str_link': str_link})
+        msg.attach_alternative(html_content, "text/html")
+        return msg.send()
+
+    def decision_by_mail(self):
+        text_content = f'We would like to invite you of for you chosen event: {self.event.title}. '
+        html_content = f'<p>We would like to invite you to <strong>{self.event.title}</strong> message.</p>'
+        str_confirmation_link = f'http://{settings.HOST}/confirmate/{self.confirmation_code}'
+        str_non_confirmation_link = f'http://{settings.HOST}/confirmate/{self.non_confirmation_code}'
+        msg = EmailMultiAlternatives(
+            f'Invitation to event: {self.event.title}, if you want to confirm your presence '
+            f'at the event please click on the following link: {str_confirmation_link}, '
+            f'if you resign please click here: {str_non_confirmation_link}',
+            text_content,
+            'from@example.com',
+            [self.mail]
+        )
+
+        html_content = render_to_string('events/decision_by_mail.html', {'event': self.event,
+                                                                         'str_confirmation_link': str_confirmation_link,
+                                                                         'str_non_confirmation_link': str_non_confirmation_link}),
         msg.attach_alternative(html_content, "text/html")
         return msg.send()
 
