@@ -103,7 +103,8 @@ class Photo(models.Model):
 
 
 
-
+class Widget(models.Model):
+    name = models.CharField(max_length=140)
 
 
 

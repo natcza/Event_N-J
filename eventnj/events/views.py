@@ -5,6 +5,8 @@ from django.utils import timezone
 from django.views import View
 from django.views.generic import FormView
 from django.views.generic.detail import DetailView
+# from django.http import HttpResponse
+# from .tasks import sleepy, send_email_task
 
 from .forms import AddParticipantForm
 from .models import Event, Participant
@@ -251,3 +253,19 @@ class AuthenticateParticipantView(DetailView):
     #
     #     ctx = {}
     #     return render(request, self.template_name, ctx)  # tu możemy przekazać kontekst
+
+
+# def index(request):
+#     send_email_delay.delay()
+#     return HttpResponse("<h1>EMAIL HAS BEEN SENT!<h1>")
+
+from django.http import HttpResponse
+from .tasks import my_first_task
+
+def index(request):
+    my_first_task.delay(10)
+    return HttpResponse('response done dupa cipjfbjfbjfbfja')
+
+
+
+# http://127.0.0.1:8000/celery-test/celery-test/
